@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="10dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/colorSurface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tambah Deposit"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorHeaderTitle"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nama"
+            android:textSize="12sp"
+            android:textColor="@color/colorInputHint"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/etNama"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Nama orang"
+            android:inputType="textPersonName|textCapWords"
+            android:textSize="15sp"
+            android:textColor="@color/colorInputText"
+            android:textColorHint="@color/colorInputHint"
+            android:background="@drawable/input_bg"
+            android:paddingHorizontal="14dp"
+            android:layout_marginBottom="14dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jumlah Deposit"
+            android:textSize="12sp"
+            android:textColor="@color/colorInputHint"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/etJumlah"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Contoh: 100000"
+            android:inputType="number"
+            android:textSize="15sp"
+            android:textColor="@color/colorInputText"
+            android:textColorHint="@color/colorInputHint"
+            android:background="@drawable/input_bg"
+            android:paddingHorizontal="14dp"
+            android:layout_marginBottom="24dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnBatal"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Batal"
+                android:textColor="@color/colorInputHint"
+                android:backgroundTint="@android:color/transparent"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+            <Button
+                android:id="@+id/btnSimpan"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Simpan"
+                android:textColor="@color/colorTotalValue"
+                android:backgroundTint="@color/colorCardTotal"
+                style="@style/Widget.MaterialComponents.Button"
+                app:cornerRadius="12dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="24dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/colorSurface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tambah Belanja"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorHeaderTitle"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tvNamaDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tvSaldoInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="@color/colorInputHint"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- Nama item -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nama Item"
+            android:textSize="12sp"
+            android:textColor="@color/colorInputHint"
+            android:layout_marginBottom="4dp"/>
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etKeterangan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|start"
+            android:inputType="textMultiLine"
+            android:lines="5"
+            android:minLines="2"
+            android:scrollbars="vertical"
+            android:textSize="15sp"
+            android:textColor="@color/colorInputText"
+            android:textColorHint="@color/colorInputHint"
+            android:paddingHorizontal="14dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Jumlah dan Harga satuan berdampingan -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jumlah (qty)"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorInputHint"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etJumlahQty"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="1"
+                    android:inputType="number"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorInputText"
+                    android:textColorHint="@color/colorInputHint"
+                    android:background="@drawable/input_bg"
+                    android:paddingHorizontal="14dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Harga Satuan"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorInputHint"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etJumlahKurang"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Contoh: 25000"
+                    android:inputType="number"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorInputText"
+                    android:textColorHint="@color/colorInputHint"
+                    android:background="@drawable/input_bg"
+                    android:paddingHorizontal="14dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Card total otomatis -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/colorBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Total"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorInputHint"/>
+
+                <TextView
+                    android:id="@+id/tvTotalDialog"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rp 0"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorHeaderTitle"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnBatalKurang"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Batal"
+                android:textColor="@color/colorInputHint"
+                android:backgroundTint="@android:color/transparent"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+            <Button
+                android:id="@+id/btnSimpanKurang"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Simpan"
+                android:textColor="@color/colorTotalValue"
+                android:backgroundTint="@color/colorCardTotal"
+                style="@style/Widget.MaterialComponents.Button"
+                app:cornerRadius="12dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
+
+    <!-- Header bar -->
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/circle_accent"
+            android:layout_marginEnd="10dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="MyNote"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorHeaderTitle"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"/>
+
+        <ImageButton
+            android:id="@+id/btnCetakStruk"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:src="@drawable/ic_cetak"
+            android:background="@drawable/btn_circle_bg"
+            android:contentDescription="Cetak struk"
+            android:padding="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <ImageButton
+            android:id="@+id/btnDeposit"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:src="@drawable/ic_wallet"
+            android:background="@drawable/btn_circle_bg"
+            android:contentDescription="Deposit"
+            android:padding="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <ImageButton
+            android:id="@+id/btnShare"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:src="@drawable/ic_share"
+            android:background="@drawable/btn_circle_bg"
+            android:contentDescription="Bagikan catatan"
+            android:padding="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <ImageButton
+            android:id="@+id/btnClear"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:src="@drawable/ic_delete"
+            android:background="@drawable/btn_circle_bg"
+            android:contentDescription="Hapus semua"
+            android:padding="8dp"/>
+
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/colorDivider"
+        android:layout_marginHorizontal="20dp"
+        app:layout_constraintTop_toBottomOf="@id/headerBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Input area -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardInput"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/colorSurface"
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintBottom_toTopOf="@id/layoutBottomBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Tulis catatan di sini..."
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:scrollbars="vertical"
+            android:background="@android:color/transparent"
+            android:textSize="15sp"
+            android:textColor="@color/colorInputText"
+            android:textColorHint="@color/colorInputHint"
+            android:lineSpacingExtra="6dp"
+            android:fontFamily="sans-serif"
+            android:padding="18dp"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Bottom bar: Simpan ke Deposit + tombol +000 sejajar -->
+    <LinearLayout
+        android:id="@+id/layoutBottomBar"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@id/cardTotal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btnSimpanDeposit"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="💾 Simpan ke Deposit"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorHeaderTitle"
+            android:backgroundTint="@color/colorSurface"
+            android:stateListAnimator="@null"
+            style="@style/Widget.MaterialComponents.Button"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/colorCardTotal"
+            app:strokeWidth="1.5dp"/>
+
+        <!-- Tombol +000 -->
+        <Button
+            android:id="@+id/btnTambahNol"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="+000"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorTotalValue"
+            android:backgroundTint="@color/colorCardTotal"
+            android:stateListAnimator="@null"
+            android:paddingHorizontal="18dp"
+            style="@style/Widget.MaterialComponents.Button"
+            app:cornerRadius="14dp"/>
+
+    </LinearLayout>
+
+    <!-- Card Total -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardTotal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="20dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="@color/colorCardTotal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="22dp"
+            android:paddingVertical="20dp">
+
+            <LinearLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:background="@drawable/circle_white_alpha"
+                android:layout_marginEnd="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="∑"
+                    android:textSize="18sp"
+                    android:textColor="@color/colorTotalValue"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TOTAL"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorTotalLabel"
+                    android:letterSpacing="0.15"
+                    android:fontFamily="sans-serif-medium"/>
+
+                <TextView
+                    android:id="@+id/txtTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rp 0"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorTotalValue"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="2dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
