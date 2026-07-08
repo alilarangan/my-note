@@ -421,9 +421,13 @@ public class MainActivity extends AppCompatActivity {
                 long harga = qtyHarga[1];
                 long total = qty * harga;
                 String nama = extractNamaItem(line);
-                sb.append("- ").append(nama)
+                if (qty == 1){
+                    sb.append("- ").append(nama).append(" → ").append(formatRupiah(harga)).append("\n");
+                }else {
+                    sb.append("- ").append(nama)
                         .append(" (").append(qty).append(" x ").append(formatRupiah(harga)).append(")")
                         .append(" → ").append(formatRupiah(total)).append("\n");
+                }
             } else {
                 sb.append(line).append("\n");
             }
