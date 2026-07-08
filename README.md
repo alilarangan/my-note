@@ -44,7 +44,7 @@ Halaman Detail Deposit:
   
 Teknologi
 - Bahasa: Java
-- Platform: Android (min SDK 21 / Android 5.0, target SDK 35)
+- Platform: Android (min SDK 30 / Android 11, target SDK 35)
 - Penyimpanan: SharedPreferences (JSON)
 - PDF: Android native PdfDocument + Canvas drawing
 - UI: Material Components, ConstraintLayout, CardView, RecyclerView
