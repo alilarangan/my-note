@@ -16,7 +16,6 @@
         android:gravity="center_vertical"
         android:padding="14dp">
 
-        <!-- Keterangan + tanggal -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -40,7 +39,6 @@
 
         </LinearLayout>
 
-        <!-- Harga -->
         <TextView
             android:id="@+id/tvJumlahBelanja"
             android:layout_width="wrap_content"
@@ -49,7 +47,6 @@
             android:textColor="@color/colorHeaderTitle"
             android:layout_marginEnd="12dp"/>
 
-        <!-- Tombol edit -->
         <TextView
             android:id="@+id/btnEditBelanja"
             android:layout_width="wrap_content"
@@ -60,7 +57,6 @@
             android:padding="4dp"
             android:layout_marginEnd="4dp"/>
 
-        <!-- Tombol hapus -->
         <TextView
             android:id="@+id/btnHapusBelanja"
             android:layout_width="wrap_content"

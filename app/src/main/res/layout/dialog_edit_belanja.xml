@@ -24,7 +24,6 @@
             android:textColor="@color/colorHeaderTitle"
             android:layout_marginBottom="20dp"/>
 
-        <!-- Nama item -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +47,6 @@
             android:paddingHorizontal="14dp"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Jumlah dan Harga satuan berdampingan -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -114,7 +112,6 @@
 
         </LinearLayout>
 
-        <!-- Card total otomatis -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

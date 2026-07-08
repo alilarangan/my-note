@@ -19,7 +19,6 @@ public class SharedPrefHelper {
         prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    // ── Simpan semua data ──
     public void simpanSemuaDeposit(List<DepositModel> list) {
         try {
             JSONArray jsonArray = new JSONArray();
@@ -48,7 +47,6 @@ public class SharedPrefHelper {
         }
     }
 
-    // ── Baca semua data ──
     public List<DepositModel> bacaSemuaDeposit() {
         List<DepositModel> list = new ArrayList<>();
         try {
@@ -72,29 +70,25 @@ public class SharedPrefHelper {
                     long qty, hargaSatuan;
 
                     if (rObj.has("qty") && rObj.has("hargaSatuan")) {
-                        // Data baru: sudah terpisah
                         qty         = rObj.getLong("qty");
                         hargaSatuan = rObj.getLong("hargaSatuan");
                     } else {
-                        // Data lama: jumlah = total, anggap qty=1
                         qty         = 1;
                         hargaSatuan = rObj.getLong("jumlah");
                     }
 
-                    // ── Migrasi data lama: nama format "bakso (2 x Rp 16.000)" ──
-                    // Coba parse qty & harga dari bagian "(N x Rp H)" di akhir nama
                     if (keterangan.contains(" (") && keterangan.contains("x") && keterangan.endsWith(")")) {
                         try {
                             int idxBuka  = keterangan.lastIndexOf(" (");
                             int idxTutup = keterangan.lastIndexOf(")");
-                            String dalam = keterangan.substring(idxBuka + 2, idxTutup); // "2 x Rp 16.000"
+                            String dalam = keterangan.substring(idxBuka + 2, idxTutup);
                             String[] parts = dalam.split("x");
                             long parsedQty   = Long.parseLong(parts[0].trim());
                             long parsedHarga = Long.parseLong(parts[1].replaceAll("[^0-9]", ""));
                             if (parsedQty > 0 && parsedHarga > 0) {
                                 qty         = parsedQty;
                                 hargaSatuan = parsedHarga;
-                                keterangan  = keterangan.substring(0, idxBuka).trim(); // bersihkan nama
+                                keterangan  = keterangan.substring(0, idxBuka).trim();
                             }
                         } catch (Exception ignored) {}
                     }

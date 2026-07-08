@@ -73,7 +73,6 @@ public class DetailDepositActivity extends AppCompatActivity {
 
         refreshUI();
     }
-
     private void refreshUI() {
         tvNamaDetail.setText(depositModel.getNama());
         tvDepositDetail.setText("Deposit awal: " + formatRupiah(depositModel.getDepositAwal()));
@@ -102,7 +101,6 @@ public class DetailDepositActivity extends AppCompatActivity {
         refreshUI();
     }
 
-    // ── Dialog edit nama & deposit awal ──
     private void showDialogEditHeader() {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -149,7 +147,6 @@ public class DetailDepositActivity extends AppCompatActivity {
         }
     }
 
-    // ── Dialog tambah belanja ──
     private void showDialogTambahBelanja() {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -201,15 +198,10 @@ public class DetailDepositActivity extends AppCompatActivity {
             if (harga <= 0) { etHarga.setError("Harus lebih dari 0"); return; }
 
             long nominal = qty * harga;
-//            if (nominal > depositModel.getSisaSaldo()) {
-//                Toast.makeText(this, "Total melebihi sisa saldo!", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
 
             String tanggal = new SimpleDateFormat("dd/MM/yyyy HH:mm",
                     new Locale("in", "ID")).format(new Date());
 
-            // ✅ Simpan nama item bersih + qty & hargaSatuan terpisah
             depositModel.tambahRiwayat(
                     new DepositModel.RiwayatBelanja(ket, qty, harga, tanggal)
             );
@@ -229,7 +221,6 @@ public class DetailDepositActivity extends AppCompatActivity {
         }
     }
 
-    // ── Dialog edit belanja ──
     private void showDialogEditBelanja(int position) {
         DepositModel.RiwayatBelanja item = depositModel.getRiwayat().get(position);
 
@@ -245,7 +236,6 @@ public class DetailDepositActivity extends AppCompatActivity {
         Button   btnSimpan         = dialog.findViewById(R.id.btnSimpanEditBelanja);
         Button   btnBatal          = dialog.findViewById(R.id.btnBatalEditBelanja);
 
-        // ✅ Langsung ambil dari field model, tidak perlu parse string lagi
         etKeterangan.setText(item.getKeterangan());
         etQty.setText(String.valueOf(item.getQty()));
         etHarga.setText(String.valueOf(item.getHargaSatuan()));
@@ -286,12 +276,7 @@ public class DetailDepositActivity extends AppCompatActivity {
             long totalBaru  = qty * harga;
             long selisih    = totalBaru - item.getTotal(); // selisih dari total lama
 
-//            if (selisih > depositModel.getSisaSaldo()) {
-//                Toast.makeText(this, "Total melebihi sisa saldo!", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
 
-            // ✅ Simpan dengan qty & hargaSatuan terpisah, nama item bersih
             depositModel.getRiwayat().set(position,
                     new DepositModel.RiwayatBelanja(ket, qty, harga, item.getTanggal()));
             depositModel.setSisaSaldo(depositModel.getSisaSaldo() - selisih);
@@ -312,7 +297,6 @@ public class DetailDepositActivity extends AppCompatActivity {
         }
     }
 
-    // ── Hapus item belanja ──
     private void hapusBelanja(int position) {
         DepositModel.RiwayatBelanja item = depositModel.getRiwayat().get(position);
         new AlertDialog.Builder(this)

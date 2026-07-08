@@ -42,7 +42,6 @@ public class BelanjaAdapter extends RecyclerView.Adapter<BelanjaAdapter.ViewHold
         holder.tvKeterangan.setText(item.getKeterangan());
         holder.tvTanggal.setText(item.getTanggal());
 
-        // Tampilkan qty x harga satuan = total
         if (item.getQty() > 1) {
             holder.tvJumlah.setText(
                     item.getQty() + " x " + formatRupiah(item.getHargaSatuan())

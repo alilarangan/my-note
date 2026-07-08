@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackground">
 
-    <!-- Header -->
     <LinearLayout
         android:id="@+id/headerDetail"
         android:layout_width="0dp"
@@ -42,7 +41,6 @@
 
     </LinearLayout>
 
-    <!-- Divider -->
     <View
         android:id="@+id/dividerDetail"
         android:layout_width="0dp"
@@ -53,7 +51,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Scroll area -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -69,7 +66,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Card info header deposit -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -141,7 +137,6 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Label daftar belanja -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -151,7 +146,6 @@
                 android:textColor="@color/colorHeaderTitle"
                 android:layout_marginBottom="8dp"/>
 
-            <!-- RecyclerView item belanja -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvBelanja"
                 android:layout_width="match_parent"
@@ -162,7 +156,6 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Tombol tambah belanja -->
     <Button
         android:id="@+id/btnTambahBelanja"
         android:layout_width="0dp"

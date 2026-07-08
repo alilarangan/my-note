@@ -65,7 +65,6 @@
             android:paddingHorizontal="14dp"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Jumlah dan Harga satuan berdampingan -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -131,7 +130,6 @@
 
         </LinearLayout>
 
-        <!-- Card total otomatis -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

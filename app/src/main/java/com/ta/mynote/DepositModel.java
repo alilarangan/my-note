@@ -31,14 +31,12 @@ public class DepositModel {
         sisaSaldo -= r.getTotal(); // kurangi pakai total (qty x harga)
     }
 
-    // ── Inner class riwayat belanja ──
     public static class RiwayatBelanja {
         private String keterangan;
-        private long   qty;          // jumlah item
-        private long   hargaSatuan;  // harga per item
+        private long   qty;
+        private long   hargaSatuan;
         private String tanggal;
 
-        // Constructor baru dengan qty & hargaSatuan
         public RiwayatBelanja(String keterangan, long qty, long hargaSatuan, String tanggal) {
             this.keterangan  = keterangan;
             this.qty         = qty;
@@ -46,7 +44,6 @@ public class DepositModel {
             this.tanggal     = tanggal;
         }
 
-        // Constructor lama (qty=1, jumlah=hargaSatuan) — untuk kompatibilitas data lama
         public RiwayatBelanja(String keterangan, long jumlah, String tanggal) {
             this.keterangan  = keterangan;
             this.qty         = 1;
@@ -60,7 +57,6 @@ public class DepositModel {
         public long   getTotal()       { return qty * hargaSatuan; }
         public String getTanggal()     { return tanggal; }
 
-        // Alias untuk kompatibilitas kode lama yang masih pakai getJumlah()
         public long getJumlah() { return getTotal(); }
     }
 }

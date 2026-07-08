@@ -81,7 +81,6 @@ public class DepositActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh data setelah kembali dari DetailDepositActivity
         listDeposit.clear();
         listDeposit.addAll(prefHelper.bacaSemuaDeposit());
         adapter.notifyDataSetChanged();

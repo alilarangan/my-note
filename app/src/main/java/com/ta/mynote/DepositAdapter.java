@@ -46,7 +46,6 @@ public class DepositAdapter extends RecyclerView.Adapter<DepositAdapter.ViewHold
         holder.tvDeposit.setText("Deposit awal: " + formatRupiah(dm.getDepositAwal()));
         holder.tvSisa.setText("Sisa: " + formatRupiah(dm.getSisaSaldo()));
 
-        // Warna sisa saldo
         int colorSisa = dm.getSisaSaldo() <= 0
                 ? ctx.getResources().getColor(R.color.colorError, null)
                 : ctx.getResources().getColor(R.color.colorHeaderTitle, null);
@@ -59,7 +58,6 @@ public class DepositAdapter extends RecyclerView.Adapter<DepositAdapter.ViewHold
         // Tap kartu → detail
         holder.itemView.setOnClickListener(v -> listener.onCardClick(position));
 
-        // Tombol WA & Hapus — cegah tap kartu ikut terpicu
         holder.btnKirimWa.setOnClickListener(v -> {
             v.setOnClickListener(null); // debounce
             listener.onKirimWaClick(position);

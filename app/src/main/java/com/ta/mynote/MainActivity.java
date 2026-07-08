@@ -1,16 +1,13 @@
 package com.ta.mynote;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -91,19 +88,13 @@ public class MainActivity extends AppCompatActivity {
         btnDeposit.setOnClickListener(v -> startActivity(new Intent(this, DepositActivity.class)));
         btnSimpanDeposit.setOnClickListener(v -> simpanKeDeposit());
 
-        // Tombol +000 langsung di layout
         Button btnTambahNol = findViewById(R.id.btnTambahNol);
         btnTambahNol.setOnClickListener(v -> tambahTigaNol());
 
-        // Tombol cetak struk
         btnCetakStruk = findViewById(R.id.btnCetakStruk);
         btnCetakStruk.setOnClickListener(v -> cetakStruk());
     }
 
-    // ─────────────────────────────────────────────────────
-    // CETAK STRUK
-    // Pilih deposit → generate PDF → buka share/print sheet
-    // ─────────────────────────────────────────────────────
     private void cetakStruk() {
         SharedPrefHelper prefHelper     = new SharedPrefHelper(this);
         List<DepositModel> semuaDeposit = prefHelper.bacaSemuaDeposit();
@@ -138,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             File pdfFile = StrukPdfHelper.generateStrukPdf(this, deposit);
 
-            // Dapatkan URI lewat FileProvider agar bisa dibuka app lain
             android.net.Uri uri = FileProvider.getUriForFile(
                     this,
                     getPackageName() + ".fileprovider",
@@ -157,28 +147,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ── Tambah 3 nol di posisi kursor ──
     private void tambahTigaNol() {
         int cursorPos = inputData.getSelectionEnd();
         if (cursorPos < 0) cursorPos = inputData.getText().length();
 
         String teks = inputData.getText().toString();
 
-        // Cek apakah karakter sebelum kursor adalah angka
         if (cursorPos > 0 && Character.isDigit(teks.charAt(cursorPos - 1))) {
-            // Sisipkan "000" di posisi kursor
             String baru = teks.substring(0, cursorPos) + "000" + teks.substring(cursorPos);
             isFormatting = true;
             inputData.setText(baru);
             inputData.setSelection(Math.min(cursorPos + 3, baru.length()));
             isFormatting = false;
 
-            // Trigger format dan hitung ulang
             String formatted = formatSemuaHarga(baru);
             if (!formatted.equals(baru)) {
                 isFormatting = true;
                 inputData.setText(formatted);
-                // Kursor ikut selisih penambahan titik
                 int selisih = formatted.length() - baru.length();
                 int newCursor = Math.min(cursorPos + 3 + selisih, formatted.length());
                 inputData.setSelection(newCursor);
@@ -190,9 +175,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ─────────────────────────────────────────────────────
-    // SIMPAN KE DEPOSIT
-    // ─────────────────────────────────────────────────────
     private void simpanKeDeposit() {
         String teks = inputData.getText().toString().trim();
         if (teks.isEmpty()) {

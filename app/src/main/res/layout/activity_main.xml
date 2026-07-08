@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackground">
 
-    <!-- Header bar -->
     <LinearLayout
         android:id="@+id/headerBar"
         android:layout_width="0dp"
@@ -80,7 +79,6 @@
 
     </LinearLayout>
 
-    <!-- Divider -->
     <View
         android:id="@+id/divider"
         android:layout_width="0dp"
@@ -91,7 +89,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Input area -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardInput"
         android:layout_width="0dp"
@@ -125,7 +122,6 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Bottom bar: Simpan ke Deposit + tombol +000 sejajar -->
     <LinearLayout
         android:id="@+id/layoutBottomBar"
         android:layout_width="0dp"
@@ -154,7 +150,6 @@
             app:strokeColor="@color/colorCardTotal"
             app:strokeWidth="1.5dp"/>
 
-        <!-- Tombol +000 -->
         <Button
             android:id="@+id/btnTambahNol"
             android:layout_width="wrap_content"
@@ -171,7 +166,6 @@
 
     </LinearLayout>
 
-    <!-- Card Total -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardTotal"
         android:layout_width="0dp"
