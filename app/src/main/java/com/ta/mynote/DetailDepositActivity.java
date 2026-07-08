@@ -80,7 +80,7 @@ public class DetailDepositActivity extends AppCompatActivity {
 
         int colorSisa = depositModel.getSisaSaldo() <= 0
                 ? getResources().getColor(R.color.colorError, null)
-                : getResources().getColor(R.color.colorHeaderTitle, null);
+                : getResources().getColor(R.color.colorTotalValue, null);
         tvSisaDetail.setTextColor(colorSisa);
 
         long totalPakai = 0;
