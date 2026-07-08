@@ -107,7 +107,7 @@ public class DepositActivity extends AppCompatActivity {
         long totalPakai = 0;
         for (DepositModel.RiwayatBelanja r : riwayat) {
             sb.append("- ").append(r.getKeterangan())
-                    .append(" (").append(r.getQty()).append("x").append(formatRupiah(r.getHargaSatuan())).append(")")
+                    .append(" (").append(r.getQty()).append(" x ").append(formatRupiah(r.getHargaSatuan())).append(")")
                     .append("  →  ").append(formatRupiah(r.getJumlah())).append("\n");
             totalPakai += r.getJumlah();
         }
