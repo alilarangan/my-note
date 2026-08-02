@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackground">
 
+    <!-- Header bar -->
     <LinearLayout
         android:id="@+id/headerBar"
         android:layout_width="0dp"
@@ -39,22 +40,22 @@
             android:letterSpacing="0.02"/>
 
         <ImageButton
-            android:id="@+id/btnCetakStruk"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:src="@drawable/ic_cetak"
-            android:background="@drawable/btn_circle_bg"
-            android:contentDescription="Cetak struk"
-            android:padding="8dp"
-            android:layout_marginEnd="8dp"/>
-
-        <ImageButton
             android:id="@+id/btnDeposit"
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:src="@drawable/ic_wallet"
             android:background="@drawable/btn_circle_bg"
             android:contentDescription="Deposit"
+            android:padding="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <ImageButton
+            android:id="@+id/btnCetakStruk"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:src="@drawable/ic_cetak"
+            android:background="@drawable/btn_circle_bg"
+            android:contentDescription="Cetak struk"
             android:padding="8dp"
             android:layout_marginEnd="8dp"/>
 
@@ -79,6 +80,7 @@
 
     </LinearLayout>
 
+    <!-- Divider -->
     <View
         android:id="@+id/divider"
         android:layout_width="0dp"
@@ -89,6 +91,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Input area -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardInput"
         android:layout_width="0dp"
@@ -100,7 +103,7 @@
         app:cardElevation="0dp"
         app:cardBackgroundColor="@color/colorSurface"
         app:layout_constraintTop_toBottomOf="@id/divider"
-        app:layout_constraintBottom_toTopOf="@id/layoutBottomBar"
+        app:layout_constraintBottom_toTopOf="@id/cardTotal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -109,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="Tulis catatan di sini..."
-            android:inputType="textMultiLine"
+            android:inputType="textCapSentences|textMultiLine"
             android:gravity="top|start"
             android:scrollbars="vertical"
             android:background="@android:color/transparent"
@@ -122,14 +125,15 @@
 
     </androidx.cardview.widget.CardView>
 
+    <!-- Bottom bar: Simpan ke Deposit + tombol +000 sejajar -->
     <LinearLayout
         android:id="@+id/layoutBottomBar"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:orientation="horizontal"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@id/cardTotal"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -139,8 +143,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="💾 Simpan ke Deposit"
-            android:textSize="13sp"
+            android:text="💾 Simpan"
+            android:textSize="10sp"
             android:textStyle="bold"
             android:textColor="@color/colorHeaderTitle"
             android:backgroundTint="@color/colorSurface"
@@ -149,7 +153,42 @@
             app:cornerRadius="14dp"
             app:strokeColor="@color/colorCardTotal"
             app:strokeWidth="1.5dp"/>
+        <!-- Tombol +[ ] -->
+        <Button
+            android:id="@+id/btnTambahChecklist"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:text="[ ]"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorHeaderTitle"
+            android:backgroundTint="@color/colorSurface"
+            android:stateListAnimator="@null"
+            android:paddingHorizontal="14dp"
+            style="@style/Widget.MaterialComponents.Button"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/colorCardTotal"
+            app:strokeWidth="1.5dp"/>
+        <!-- Tombol +- -->
+        <Button
+            android:id="@+id/btnTambahDash"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:text="-"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorHeaderTitle"
+            android:backgroundTint="@color/colorSurface"
+            android:stateListAnimator="@null"
+            android:paddingHorizontal="14dp"
+            style="@style/Widget.MaterialComponents.Button"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/colorCardTotal"
+            app:strokeWidth="1.5dp"/>
 
+        <!-- Tombol +000 -->
         <Button
             android:id="@+id/btnTambahNol"
             android:layout_width="wrap_content"
@@ -160,22 +199,23 @@
             android:textColor="@color/colorTotalValue"
             android:backgroundTint="@color/colorCardTotal"
             android:stateListAnimator="@null"
-            android:paddingHorizontal="18dp"
+            android:paddingHorizontal="14dp"
             style="@style/Widget.MaterialComponents.Button"
             app:cornerRadius="14dp"/>
 
     </LinearLayout>
 
+    <!-- Card Total -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardTotal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="8dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="6dp"
         app:cardBackgroundColor="@color/colorCardTotal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layoutBottomBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

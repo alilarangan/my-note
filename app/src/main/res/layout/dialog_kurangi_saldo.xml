@@ -55,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top|start"
-            android:inputType="textMultiLine"
+            android:inputType="textCapSentences|textMultiLine"
             android:lines="5"
             android:minLines="2"
             android:scrollbars="vertical"
