@@ -44,7 +44,7 @@ Halaman Detail Deposit:
   
 Teknologi
 - Bahasa: Java
-- Platform: Android (min SDK 21 / Android 5.0, target SDK 35)
+- Platform: Android (min SDK 30 / Android 11, target SDK 35)
 - Penyimpanan: SharedPreferences (JSON)
 - PDF: Android native PdfDocument + Canvas drawing
 - UI: Material Components, ConstraintLayout, CardView, RecyclerView
@@ -54,4 +54,7 @@ Cocok Digunakan Untuk
 - Pedagang warung/kantin yang mencatat pesanan harian
 - Koordinator arisan atau patungan makanan
 - Siapa saja yang perlu mencatat belanja dan mengelola titipan uang
+
+<img width="720" height="1600" alt="Screenshot_20260708_122253_MyNote" src="https://github.com/user-attachments/assets/d06b8fd4-3440-4f7a-bffe-363d365fcb47" />
+
      
