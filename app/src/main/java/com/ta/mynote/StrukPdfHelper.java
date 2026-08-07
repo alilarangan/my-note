@@ -22,11 +22,14 @@ import java.util.Locale;
  */
 public class StrukPdfHelper {
 
+    // Konversi: 1 inch = 72pt, 1 cm = 72/2.54 pt
     private static final float CM_TO_PT   = 72f / 2.54f;
 
+    // Ukuran A4 landscape dalam point
     private static final float A4_LEBAR   = 29.7f * CM_TO_PT; // ~842 pt
     private static final float A4_TINGGI  = 21.0f * CM_TO_PT; // ~595 pt
 
+    // Nota hanya di 10cm kiri
     private static final float NOTA_LEBAR = 10.0f * CM_TO_PT;
     private static final float MARGIN      = 0.5f * CM_TO_PT;
     private static final int   MIN_BARIS   = 13;
@@ -34,18 +37,20 @@ public class StrukPdfHelper {
     private static final float TINGGI_HEADER = 110f;
     private static final float TINGGI_FOOTER = 80f;
 
-    public static File generateStrukPdf(Context context, DepositModel deposit) {
+    public static File generateStrukPdf(Context context, DepositModel deposit, String tanggal) {
         PdfDocument document = new PdfDocument();
 
+        // Halaman A4 landscape
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(
                 (int) A4_LEBAR, (int) A4_TINGGI, 1).create();
         PdfDocument.Page page = document.startPage(pageInfo);
         Canvas canvas = page.getCanvas();
 
-        gambarStruk(canvas, deposit);
+        gambarStruk(canvas, deposit, tanggal);
 
         document.finishPage(page);
 
+        // Simpan ke cache
         File outputDir = new File(context.getCacheDir(), "struk");
         if (!outputDir.exists()) outputDir.mkdirs();
 
@@ -63,7 +68,14 @@ public class StrukPdfHelper {
         return file;
     }
 
-    private static void gambarStruk(Canvas canvas, DepositModel deposit) {
+    private static void gambarStruk(Canvas canvas, DepositModel deposit, String tanggal) {
+
+        // ── Paint definitions ──
+        Paint garisTebal = new Paint();
+        garisTebal.setColor(Color.BLACK);
+        garisTebal.setStrokeWidth(1.5f);
+        garisTebal.setStyle(Paint.Style.STROKE);
+        garisTebal.setAntiAlias(true);
 
         Paint garisTipis = new Paint();
         garisTipis.setColor(Color.BLACK);
@@ -86,10 +98,10 @@ public class StrukPdfHelper {
         float y = MARGIN;
         float isiLebar = NOTA_LEBAR - (2 * MARGIN);
 
-        String tanggal = new SimpleDateFormat("dd/MM/yyyy", new Locale("in", "ID")).format(new Date());
         normal.setTextSize(8f);
         drawDotLine(canvas, x + 180, y + 10, x + isiLebar, garisTipis);
         drawTextRight(canvas, tanggal, x + isiLebar, y + 9, normal);
+
 
         y += 20;
         normal.setTextSize(9f);
@@ -110,7 +122,7 @@ public class StrukPdfHelper {
         String noNota = deposit.getId().substring(0, 8).toUpperCase();
         canvas.drawText(noNota, x + bold.measureText("NOTA NO.") + 6, y, normal);
         drawDotLine(canvas, x + labelW + 153, y, x + isiLebar, garisTipis);
-        // Garis bawah Nota No
+
         y += 5;
         canvas.drawLine(x, y, x + isiLebar, y, garisTipis);
 
@@ -155,15 +167,19 @@ public class StrukPdfHelper {
                 DepositModel.RiwayatBelanja item = riwayat.get(i);
                 float tY = rowY + (TINGGI_BARIS / 2f) + 3.5f;
 
+                // Qty (center)
                 String qtyStr = item.getQty() > 1
                         ? item.getQty() + ""
                         : "1";
                 drawTextCenter(canvas, qtyStr, cQty, cQty + cQtyW, tY, normal);
 
+                // Nama barang (kiri, ellipsis kalau panjang)
                 drawTextEllipsis(canvas, item.getKeterangan(), cNama + 3, cNama + cNamaW - 3, tY, normal);
 
+                // Harga satuan (kanan)
                 drawTextRight(canvas, nf.format(item.getHargaSatuan()), cHarga + cHargaW - 3, tY, normal);
 
+                // Jumlah total (kanan)
                 drawTextRight(canvas, nf.format(item.getTotal()), cJumlah + cJumlahW - 3, tY, normal);
             }
 
@@ -172,11 +188,18 @@ public class StrukPdfHelper {
 
         float tableBottom = rowY;
 
+        // Garis kiri & kanan tabel
         canvas.drawLine(x, tableTop, x, tableBottom, garisTipis);
         canvas.drawLine(x + isiLebar, tableTop, x + isiLebar, tableBottom, garisTipis);
+        // Garis bawah tabel lebih tebal
         canvas.drawLine(x, tableBottom, x + isiLebar, tableBottom, garisTipis);
 
+        // ═══════════════════════════════
+        // FOOTER
+        // ═══════════════════════════════
         float fY = tableBottom + 18;
+
+        // Jumlah Rp
         long totalDipakai = 0;
         for (DepositModel.RiwayatBelanja r : riwayat) totalDipakai += r.getTotal();
 
@@ -184,16 +207,20 @@ public class StrukPdfHelper {
         canvas.drawText("Jumlah Rp.", cHarga - 5, fY, bold);
         String totalStr = nf.format(totalDipakai);
         drawTextRight(canvas, totalStr, x + isiLebar - 3, fY, bold);
+        // Garis ganda bawah total
         canvas.drawLine(cJumlah, fY + 3, x + isiLebar, fY + 3, garisTipis);
         canvas.drawLine(cJumlah, fY + 5, x + isiLebar, fY + 5, garisTipis);
 
+        // Tanda Terima & Hormat kami
         fY += 28;
         normal.setTextSize(8.5f);
         canvas.drawText("Tanda Terima", x, fY, normal);
         canvas.drawText("Hormat kami,", cHarga, fY, normal);
 
         drawVDash(canvas, NOTA_LEBAR, MARGIN, A4_TINGGI - MARGIN, garisTipis);
+
     }
+
 
     private static void drawTextCenter(Canvas canvas, String text, float left, float right, float y, TextPaint p) {
         float tw = p.measureText(text);

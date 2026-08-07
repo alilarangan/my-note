@@ -129,10 +129,16 @@ public class MainActivity extends AppCompatActivity {
         btnTambahDash.setOnClickListener(v -> sisipkanTeks(" - "));
         btnTambahChecklis.setOnClickListener(v -> tambahChecklist());
     }
+
+    // ─────────────────────────────────────────────────────
+    // CHECKLIST — SPANNABLE
+    // ─────────────────────────────────────────────────────
+
     private void applyChecklistSpans(Spannable span) {
         if (span == null) return;
         String teks = span.toString();
 
+        // Hapus span lama
         for (StrikethroughSpan s : span.getSpans(0, span.length(), StrikethroughSpan.class)) span.removeSpan(s);
         for (ForegroundColorSpan s : span.getSpans(0, span.length(), ForegroundColorSpan.class)) span.removeSpan(s);
 
@@ -182,6 +188,10 @@ public class MainActivity extends AppCompatActivity {
         hitungTotal(teksBaru);
         isFormatting = false;
     }
+
+    // ─────────────────────────────────────────────────────
+    // FORMAT & HITUNG
+    // ─────────────────────────────────────────────────────
 
     private String formatSemuaBaris(String text) {
         String[] lines = text.split("\n", -1);
@@ -255,17 +265,15 @@ public class MainActivity extends AppCompatActivity {
         if (akhirBaris == -1){
             akhirBaris = teks.length();
         }
-
         String baru = teks.substring(0, akhirBaris)+tambahan+teks.substring(akhirBaris);
-
         isFormatting = true;
         inputData.setText(baru);
         inputData.setSelection(akhirBaris + tambahan.length());
-
         applyChecklistSpans(inputData.getText());
         hitungTotal(baru);
         isFormatting = false;
     }
+
     private void tambahChecklist() {
         int cursor = inputData.getSelectionEnd();
         if (cursor < 0) cursor = inputData.getText().length();
@@ -312,7 +320,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void bagikanCatatan() {
         String gabungan = getTeksIsi();
-        if (gabungan.isEmpty()) { Toast.makeText(this, "Catatan masih kosong!", Toast.LENGTH_SHORT).show(); return; }
+        if (gabungan.isEmpty()) {
+            Toast.makeText(this, "Catatan masih kosong!", Toast.LENGTH_SHORT).show(); return;
+        }
 
         String waktu = new SimpleDateFormat("dd/MM/yyyy HH:mm", new Locale("in", "ID")).format(new Date());
         StringBuilder sb = new StringBuilder();
@@ -464,13 +474,34 @@ public class MainActivity extends AppCompatActivity {
                 .setItems(pilihan, (dialog, which) -> {
                     DepositModel d = semuaDeposit.get(which);
                     if (d.getRiwayat().isEmpty()) { Toast.makeText(this, "Belum ada item!", Toast.LENGTH_SHORT).show(); return; }
-                    generateDanBukaStruk(d);
+                    pilihTanggalCetak(d);
                 }).setNegativeButton("Batal", null).show();
     }
 
-    private void generateDanBukaStruk(DepositModel deposit) {
+    /** Dialog DatePicker untuk memilih tanggal cetak struk */
+    private void pilihTanggalCetak(DepositModel deposit) {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+
+        android.app.DatePickerDialog datePicker = new android.app.DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    // Format tanggal yang dipilih
+                    String tanggalDipilih = String.format(new Locale("in", "ID"),
+                            "%02d/%02d/%04d", dayOfMonth, month + 1, year);
+                    generateDanBukaStruk(deposit, tanggalDipilih);
+                },
+                cal.get(java.util.Calendar.YEAR),
+                cal.get(java.util.Calendar.MONTH),
+                cal.get(java.util.Calendar.DAY_OF_MONTH)
+        );
+
+        datePicker.setTitle("Pilih tanggal cetak");
+        datePicker.show();
+    }
+
+    private void generateDanBukaStruk(DepositModel deposit, String tanggal) {
         try {
-            File pdfFile = StrukPdfHelper.generateStrukPdf(this, deposit);
+            File pdfFile = StrukPdfHelper.generateStrukPdf(this, deposit, tanggal);
             android.net.Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", pdfFile);
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("application/pdf");
@@ -481,11 +512,17 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Gagal membuat struk: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
+    // ─────────────────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────────────────
+
     private String stripChecklistPrefix(String line) {
         if (line.startsWith("[ ] ") || line.startsWith("[x] ") || line.startsWith("[X] ")) return line.substring(4);
         if (line.startsWith("[ ]") || line.startsWith("[x]") || line.startsWith("[X]")) return line.substring(3);
         return line;
     }
+
     private long[] parseQtyHargaDariBaris(String line) {
         String b = line.toLowerCase().replace(".", "");
         try {
