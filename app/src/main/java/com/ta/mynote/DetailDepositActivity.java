@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -73,6 +74,7 @@ public class DetailDepositActivity extends AppCompatActivity {
 
         refreshUI();
     }
+
     private void refreshUI() {
         tvNamaDetail.setText(depositModel.getNama());
         tvDepositDetail.setText("Deposit awal: " + formatRupiah(depositModel.getDepositAwal()));
@@ -91,16 +93,22 @@ public class DetailDepositActivity extends AppCompatActivity {
     }
 
     private void simpanDanRefresh() {
+        // Update depositModel di list
         for (int i = 0; i < semuaDeposit.size(); i++) {
             if (semuaDeposit.get(i).getId().equals(depositModel.getId())) {
                 semuaDeposit.set(i, depositModel);
                 break;
             }
         }
-        prefHelper.simpanSemuaDeposit(semuaDeposit);
+        // semuaDeposit urutan DESC (karena SharedPrefHelper baca dari belakang)
+        // Reverse ke ASC dulu sebelum simpan agar saat dibaca lagi DESC tetap benar
+        List<DepositModel> urut = new java.util.ArrayList<>(semuaDeposit);
+        Collections.reverse(urut);
+        prefHelper.simpanSemuaDeposit(urut);
         refreshUI();
     }
 
+    // ── Dialog edit nama & deposit awal ──
     private void showDialogEditHeader() {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -137,16 +145,12 @@ public class DetailDepositActivity extends AppCompatActivity {
 
         btnBatal.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
-
         Window window = dialog.getWindow();
-        if (window != null) {
-            window.setLayout(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-        }
+        if (window != null) window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
     }
 
+    // ── Dialog tambah belanja ──
     private void showDialogTambahBelanja() {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -198,10 +202,15 @@ public class DetailDepositActivity extends AppCompatActivity {
             if (harga <= 0) { etHarga.setError("Harus lebih dari 0"); return; }
 
             long nominal = qty * harga;
+            if (nominal > depositModel.getSisaSaldo()) {
+                Toast.makeText(this, "Total melebihi sisa saldo!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             String tanggal = new SimpleDateFormat("dd/MM/yyyy HH:mm",
                     new Locale("in", "ID")).format(new Date());
 
+            // ✅ Simpan nama item bersih + qty & hargaSatuan terpisah
             depositModel.tambahRiwayat(
                     new DepositModel.RiwayatBelanja(ket, qty, harga, tanggal)
             );
@@ -211,16 +220,12 @@ public class DetailDepositActivity extends AppCompatActivity {
 
         btnBatal.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
-
         Window window = dialog.getWindow();
-        if (window != null) {
-            window.setLayout(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-        }
+        if (window != null) window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
     }
 
+    // ── Dialog edit belanja ──
     private void showDialogEditBelanja(int position) {
         DepositModel.RiwayatBelanja item = depositModel.getRiwayat().get(position);
 
@@ -236,6 +241,7 @@ public class DetailDepositActivity extends AppCompatActivity {
         Button   btnSimpan         = dialog.findViewById(R.id.btnSimpanEditBelanja);
         Button   btnBatal          = dialog.findViewById(R.id.btnBatalEditBelanja);
 
+        // ✅ Langsung ambil dari field model, tidak perlu parse string lagi
         etKeterangan.setText(item.getKeterangan());
         etQty.setText(String.valueOf(item.getQty()));
         etHarga.setText(String.valueOf(item.getHargaSatuan()));
@@ -276,7 +282,12 @@ public class DetailDepositActivity extends AppCompatActivity {
             long totalBaru  = qty * harga;
             long selisih    = totalBaru - item.getTotal(); // selisih dari total lama
 
+            if (selisih > depositModel.getSisaSaldo()) {
+                Toast.makeText(this, "Total melebihi sisa saldo!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            // ✅ Simpan dengan qty & hargaSatuan terpisah, nama item bersih
             depositModel.getRiwayat().set(position,
                     new DepositModel.RiwayatBelanja(ket, qty, harga, item.getTanggal()));
             depositModel.setSisaSaldo(depositModel.getSisaSaldo() - selisih);
@@ -287,16 +298,12 @@ public class DetailDepositActivity extends AppCompatActivity {
 
         btnBatal.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
-
         Window window = dialog.getWindow();
-        if (window != null) {
-            window.setLayout(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-        }
+        if (window != null) window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
     }
 
+    // ── Hapus item belanja ──
     private void hapusBelanja(int position) {
         DepositModel.RiwayatBelanja item = depositModel.getRiwayat().get(position);
         new AlertDialog.Builder(this)
@@ -309,6 +316,7 @@ public class DetailDepositActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Batal", null)
                 .show();
+
     }
 
     private String formatRupiah(long angka) {

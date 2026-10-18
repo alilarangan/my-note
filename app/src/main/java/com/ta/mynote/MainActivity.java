@@ -157,7 +157,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void toggleCheckboxPadaTap(float tapX, float tapY) {
         if (inputData.getLayout() == null) return;
-        int line = inputData.getLayout().getLineForVertical((int) (tapY - inputData.getTotalPaddingTop()));
+        int offsetY = (int) (tapY - inputData.getTotalPaddingTop() + inputData.getScrollY());
+        int line    = inputData.getLayout().getLineForVertical(offsetY);
         if (line < 0) return;
 
         int lineStart = inputData.getLayout().getLineStart(line);
@@ -214,28 +215,75 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String formatHargaDalamBaris(String line) {
-        Matcher m1 = Pattern.compile("(-\\s*)([0-9][0-9.]*)(\\s*x\\s*)([0-9]{1,3})\\s*$").matcher(line);
-        if (m1.find()) return line.substring(0, m1.start()) + m1.group(1)
-                + formatAngka(m1.group(2).replace(".", "")) + " x " + m1.group(4);
+        // Pola 1: "- angka x angka" di akhir — format KEDUANYA
+        // Contoh: "- 20000 x 3"  → "- 20.000 x 3"
+        // Contoh: "- 3 x 20000"  → "- 3 x 20.000"
+        Matcher m1 = Pattern.compile("(-\\s*)([0-9][0-9.]*)(\\s*x\\s*)([0-9][0-9.]*)\\s*$").matcher(line);
+        if (m1.find()) {
+            String angka1 = m1.group(2).replace(".", "");
+            String angka2 = m1.group(4).replace(".", "");
+            // Yang lebih besar = harga (diformat), yang lebih kecil = qty (tetap)
+            long n1 = 0, n2 = 0;
+            try { n1 = Long.parseLong(angka1); n2 = Long.parseLong(angka2); } catch (Exception ignored) {}
+            String fmt1 = n1 >= n2 ? formatAngka(angka1) : angka1;
+            String fmt2 = n2 > n1  ? formatAngka(angka2) : angka2;
+            return line.substring(0, m1.start()) + m1.group(1) + fmt1 + " x " + fmt2;
+        }
 
+        // Pola 2: "- harga" saja di akhir
+        // Contoh: "Nasi goreng - 20000" → "Nasi goreng - 20.000"
         Matcher m2 = Pattern.compile("(-\\s*)([0-9][0-9.]*)\\s*$").matcher(line);
         if (m2.find()) return line.substring(0, m2.start()) + m2.group(1)
                 + formatAngka(m2.group(2).replace(".", ""));
 
-        Matcher m3 = Pattern.compile("^([^-]*)([0-9]{1,3})(\\s*x\\s*)([0-9][0-9.]*)\\s*$").matcher(line);
-        if (m3.find()) return m3.group(1) + m3.group(2) + " x " + formatAngka(m3.group(4).replace(".", ""));
+        // Pola 3: "angka x angka" tanpa "-"
+        // Contoh: "3 x 20000" → "3 x 20.000"
+        Matcher m3 = Pattern.compile("^([^-]*)([0-9][0-9.]*)(\\s*x\\s*)([0-9][0-9.]*)\\s*$").matcher(line);
+        if (m3.find()) {
+            String angka1 = m3.group(2).replace(".", "");
+            String angka2 = m3.group(4).replace(".", "");
+            long n1 = 0, n2 = 0;
+            try { n1 = Long.parseLong(angka1); n2 = Long.parseLong(angka2); } catch (Exception ignored) {}
+            String fmt1 = n1 >= n2 ? formatAngka(angka1) : angka1;
+            String fmt2 = n2 > n1  ? formatAngka(angka2) : angka2;
+            return m3.group(1) + fmt1 + " x " + fmt2;
+        }
 
         return line;
     }
 
     private void hitungTotal(String text) {
         long total = 0;
+
+        // Cek apakah ada checklist di teks
+        boolean adaChecklist = text.contains("[ ]") || text.contains("[x]") || text.contains("[X]");
+
         for (String line : text.split("\n")) {
-            total += parseHargaDariBaris(stripChecklistPrefix(line.trim()));
+            line = line.trim();
+            if (line.isEmpty()) continue;
+
+            if (adaChecklist) {
+                // Hanya hitung baris yang sudah dicentang [x]
+                if (line.startsWith("[x] ") || line.startsWith("[X] ")) {
+                    total += parseHargaDariBaris(line.substring(4));
+                } else if (line.startsWith("[x]") || line.startsWith("[X]")) {
+                    total += parseHargaDariBaris(line.substring(3));
+                }
+                // [ ] yang belum dicentang → skip
+            } else {
+                // Tidak ada checklist → hitung semua baris
+                total += parseHargaDariBaris(line);
+            }
         }
+
         totalTerakhir = formatRupiah(total);
         hasil.setText(totalTerakhir);
     }
+
+    // ─────────────────────────────────────────────────────
+    // TOMBOL ACTIONS
+    // ─────────────────────────────────────────────────────
+
     private void tambahTigaNol() {
         int cursor = inputData.getSelectionEnd();
         if (cursor < 0) cursor = inputData.getText().length();
@@ -256,53 +304,47 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Sisipkan teks di posisi kursor */
     private void sisipkanTeks(String tambahan) {
+        int cursor = inputData.getSelectionEnd();
+        if (cursor < 0) cursor = inputData.getText().length();
         String teks = inputData.getText().toString();
-        int cursor = inputData.getSelectionStart();
-
-        int akhirBaris = teks.indexOf('\n', cursor);
-
-        if (akhirBaris == -1){
-            akhirBaris = teks.length();
-        }
-        String baru = teks.substring(0, akhirBaris)+tambahan+teks.substring(akhirBaris);
+        String baru = teks.substring(0, cursor) + tambahan + teks.substring(cursor);
         isFormatting = true;
         inputData.setText(baru);
-        inputData.setSelection(akhirBaris + tambahan.length());
+        inputData.setSelection(cursor + tambahan.length());
         applyChecklistSpans(inputData.getText());
         hitungTotal(baru);
         isFormatting = false;
     }
 
+    /**
+     * Tambah [ ] di awal baris yang sedang aktif.
+     * Kalau sudah ada prefix checklist → tidak ditambah lagi.
+     */
     private void tambahChecklist() {
         int cursor = inputData.getSelectionEnd();
         if (cursor < 0) cursor = inputData.getText().length();
         String teks = inputData.getText().toString();
+
+        // Cari awal dan akhir baris saat ini
         int awalBaris = teks.lastIndexOf('\n', cursor - 1) + 1;
         int akhirBaris = teks.indexOf('\n', cursor);
         if (akhirBaris < 0) akhirBaris = teks.length();
+
         String bari = teks.substring(awalBaris, akhirBaris);
 
-        int cursorBaru = cursor;
-
-        if (bari.startsWith("[ ] ")) {
-            bari = bari.substring(4);
-            cursorBaru = Math.max(awalBaris, cursor - 4);
-        } else if (bari.startsWith("[x] ")) {
-            bari = bari.substring(4);
-            cursorBaru = Math.max(awalBaris, cursor - 4);
-        } else if (bari.startsWith("[X] ")) {
-            bari = bari.substring(4);
-            cursorBaru = Math.max(awalBaris, cursor - 4);
-        } else {
-            bari = "[ ] " + bari;
-            cursorBaru = Math.max(awalBaris, cursor + 4);
+        // Kalau sudah ada checklist prefix → tidak ditambah lagi
+        if (bari.startsWith("[ ]") || bari.startsWith("[x]") || bari.startsWith("[X]")) {
+            Toast.makeText(this, "Baris ini sudah checklist", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        String baru = teks.substring(0, awalBaris) + bari + teks.substring(akhirBaris);
+        String prefix = "[ ] ";
+        String baru = teks.substring(0, awalBaris) + prefix + bari + teks.substring(akhirBaris);
         isFormatting = true;
         inputData.setText(baru);
-        inputData.setSelection(Math.min(cursorBaru, baru.length()));
+        inputData.setSelection(Math.min(cursor + prefix.length(), baru.length()));
         applyChecklistSpans(inputData.getText());
         hitungTotal(baru);
         isFormatting = false;
@@ -320,43 +362,51 @@ public class MainActivity extends AppCompatActivity {
 
     private void bagikanCatatan() {
         String gabungan = getTeksIsi();
-        if (gabungan.isEmpty()) {
-            Toast.makeText(this, "Catatan masih kosong!", Toast.LENGTH_SHORT).show(); return;
-        }
+        if (gabungan.isEmpty()) { Toast.makeText(this, "Catatan masih kosong!", Toast.LENGTH_SHORT).show(); return; }
 
         String waktu = new SimpleDateFormat("dd/MM/yyyy HH:mm", new Locale("in", "ID")).format(new Date());
         StringBuilder sb = new StringBuilder();
         sb.append("*List Belanja & Harga*\n").append(waktu).append("\n─────────────────\n");
 
+        boolean adaChecklist = gabungan.contains("[ ]") || gabungan.contains("[x]") || gabungan.contains("[X]");
+        boolean adaItem = false;
         for (String line : gabungan.split("\n")) {
             line = line.trim();
             if (line.isEmpty()) continue;
 
             String isi = line;
-            if (line.startsWith("[x] ") || line.startsWith("[X] ")) {
-                isi = line.substring(4);
-            } else if (line.startsWith("[ ] ")) {
-                isi = line.substring(4);
-            } else if (line.startsWith("[x]") || line.startsWith("[X]")) {
-                isi = line.substring(3);
-            } else if (line.startsWith("[ ]")) {
-                isi = line.substring(3);
+
+            if (adaChecklist) {
+                // ✅ Kalau ada checklist → hanya kirim yang sudah dicentang [x]
+                if (line.startsWith("[x] ") || line.startsWith("[X] ")) {
+                    isi = line.substring(4);
+                } else if (line.startsWith("[x]") || line.startsWith("[X]")) {
+                    isi = line.substring(3);
+                } else {
+                    continue; // Skip baris yang belum dicentang atau baris biasa
+                }
             }
+            // Kalau tidak ada checklist sama sekali → kirim semua yang punya harga
 
             long[] qh = parseQtyHargaDariBaris(isi);
-            if (qh != null) {
-                if (qh[0] == 1) {
-                    sb.append("- ").append(extractNamaItem(isi))
-                            .append(" → ").append(formatRupiah(qh[1])).append("\n");
-                } else {
-                    sb.append("- ").append(extractNamaItem(isi))
-                            .append(" (").append(qh[0]).append(" x ").append(formatRupiah(qh[1])).append(")")
-                            .append(" → ").append(formatRupiah(qh[0] * qh[1])).append("\n");
-                }
+            if (qh == null) continue;
+
+            adaItem = true;
+            if (qh[0] == 1) {
+                sb.append("- ").append(extractNamaItem(isi))
+                        .append(" → ").append(formatRupiah(qh[1])).append("\n");
             } else {
-                sb.append(isi).append("\n");
+                sb.append("- ").append(extractNamaItem(isi))
+                        .append(" (").append(qh[0]).append(" x ").append(formatRupiah(qh[1])).append(")")
+                        .append(" → ").append(formatRupiah(qh[0] * qh[1])).append("\n");
             }
         }
+
+        if (!adaItem) {
+            Toast.makeText(this, "Tidak ada item yang dicentang!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         sb.append("─────────────────\n*Total : ").append(totalTerakhir).append("*");
 
         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -369,10 +419,21 @@ public class MainActivity extends AppCompatActivity {
         String gabungan = getTeksIsi();
         if (gabungan.isEmpty()) { Toast.makeText(this, "Catatan masih kosong!", Toast.LENGTH_SHORT).show(); return; }
 
-        String[] semuaBaris = gabungan.split("\n", -1);
+        String[] semuaBaris  = gabungan.split("\n", -1);
+        boolean adaChkDeposit = false;
+        for (String b : semuaBaris) {
+            String t = b.trim();
+            if (t.startsWith("[ ]") || t.startsWith("[x]") || t.startsWith("[X]")) { adaChkDeposit = true; break; }
+        }
         int jumlahItem = 0;
         for (String b : semuaBaris) {
-            if (parseHargaDariBaris(stripChecklistPrefix(b.trim())) > 0) jumlahItem++;
+            String t = b.trim();
+            if (adaChkDeposit) {
+                if ((t.startsWith("[x] ") || t.startsWith("[X] ")) && parseHargaDariBaris(t.substring(4)) > 0) jumlahItem++;
+                else if ((t.startsWith("[x]") || t.startsWith("[X]")) && parseHargaDariBaris(t.substring(3)) > 0) jumlahItem++;
+            } else {
+                if (parseHargaDariBaris(stripChecklistPrefix(t)) > 0) jumlahItem++;
+            }
         }
         if (jumlahItem == 0) { Toast.makeText(this, "Tidak ada item dengan harga!", Toast.LENGTH_SHORT).show(); return; }
 
@@ -423,8 +484,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void konfirmasiDanSimpan(DepositModel dipilih, String[] semuaBaris, SharedPrefHelper prefHelper, List<DepositModel> semuaDeposit) {
+        // Hitung total hanya dari item yang dicentang (konsisten dengan masukkanItemKe)
+        boolean adaChecklist = false;
+        for (String b : semuaBaris) {
+            String t = b.trim();
+            if (t.startsWith("[ ]") || t.startsWith("[x]") || t.startsWith("[X]")) { adaChecklist = true; break; }
+        }
         long total = 0;
-        for (String b : semuaBaris) total += parseHargaDariBaris(stripChecklistPrefix(b.trim()));
+        for (String b : semuaBaris) {
+            String t = b.trim();
+            if (adaChecklist) {
+                if (t.startsWith("[x] ") || t.startsWith("[X] ")) total += parseHargaDariBaris(t.substring(4));
+                else if (t.startsWith("[x]") || t.startsWith("[X]")) total += parseHargaDariBaris(t.substring(3));
+            } else {
+                total += parseHargaDariBaris(stripChecklistPrefix(t));
+            }
+        }
         new AlertDialog.Builder(this)
                 .setTitle("Konfirmasi")
                 .setMessage("Tambahkan ke *" + dipilih.getNama() + "*?\n\nTotal: " + formatRupiah(total) + "\nSisa: " + formatRupiah(dipilih.getSisaSaldo()))
@@ -437,8 +512,33 @@ public class MainActivity extends AppCompatActivity {
         int itemMasuk = 0;
         long totalBelanja = 0;
 
+        // Cek apakah ada checklist di catatan
+        boolean adaChecklist = false;
         for (String line : semuaBaris) {
-            String isi = stripChecklistPrefix(line.trim());
+            if (line.trim().startsWith("[ ]") || line.trim().startsWith("[x]") || line.trim().startsWith("[X]")) {
+                adaChecklist = true; break;
+            }
+        }
+
+        for (String line : semuaBaris) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+
+            String isi;
+            if (adaChecklist) {
+                // ✅ Hanya simpan baris yang sudah dicentang [x]
+                if (line.startsWith("[x] ") || line.startsWith("[X] ")) {
+                    isi = line.substring(4);
+                } else if (line.startsWith("[x]") || line.startsWith("[X]")) {
+                    isi = line.substring(3);
+                } else {
+                    continue; // Skip yang belum dicentang
+                }
+            } else {
+                // Tidak ada checklist → simpan semua yang punya harga
+                isi = stripChecklistPrefix(line);
+            }
+
             if (isi.isEmpty()) continue;
             long[] qh = parseQtyHargaDariBaris(isi);
             if (qh != null) {
@@ -526,16 +626,35 @@ public class MainActivity extends AppCompatActivity {
     private long[] parseQtyHargaDariBaris(String line) {
         String b = line.toLowerCase().replace(".", "");
         try {
-            Matcher m1 = Pattern.compile("-(\\s*[0-9]+)\\s*x\\s*([0-9]{1,3})\\s*$").matcher(b);
-            if (m1.find()) return new long[]{ Long.parseLong(m1.group(2).trim()), Long.parseLong(m1.group(1).trim()) };
-
-            if (b.matches("^[^a-z\\-]*[0-9]+\\s*x\\s*[0-9]+.*$")) {
-                Matcher m = Pattern.compile("([0-9]+)\\s*x\\s*([0-9]+)").matcher(b);
-                long qty = 0, harga = 0;
-                while (m.find()) { qty = Long.parseLong(m.group(1)); harga = Long.parseLong(m.group(2)); }
-                if (qty > 0 && harga > 0) return new long[]{qty, harga};
+            // Pola: "- angka x angka" di akhir baris
+            // Contoh: "- 20000 x 3" atau "- 3 x 20000" → keduanya [qty=3, harga=20000]
+            Matcher m1 = Pattern.compile("-(\\s*[0-9]+)\\s*x\\s*([0-9]+)\\s*$").matcher(b);
+            if (m1.find()) {
+                long angka1 = Long.parseLong(m1.group(1).trim());
+                long angka2 = Long.parseLong(m1.group(2).trim());
+                long harga  = Math.max(angka1, angka2);
+                long qty    = Math.min(angka1, angka2);
+                if (qty == 0) qty = 1;
+                return new long[]{qty, harga};
             }
 
+            // Pola: "angka x angka" tanpa "-"
+            // Contoh: "3 x 20000" atau "20000 x 3" → keduanya [qty=3, harga=20000]
+            if (b.matches("^[^a-z\\-]*[0-9]+\\s*x\\s*[0-9]+.*$")) {
+                Matcher m = Pattern.compile("([0-9]+)\\s*x\\s*([0-9]+)").matcher(b);
+                long angka1 = 0, angka2 = 0;
+                while (m.find()) {
+                    angka1 = Long.parseLong(m.group(1));
+                    angka2 = Long.parseLong(m.group(2));
+                }
+                if (angka1 > 0 && angka2 > 0) {
+                    long harga = Math.max(angka1, angka2);
+                    long qty   = Math.min(angka1, angka2);
+                    return new long[]{qty, harga};
+                }
+            }
+
+            // Pola: "- harga" saja tanpa x
             if (b.contains("-")) {
                 int d = b.lastIndexOf("-");
                 String angka = b.substring(d + 1).trim().replaceAll("[^0-9]", "");

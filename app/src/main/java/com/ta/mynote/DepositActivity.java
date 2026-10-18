@@ -18,8 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -81,6 +79,7 @@ public class DepositActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Refresh data setelah kembali dari DetailDepositActivity
         listDeposit.clear();
         listDeposit.addAll(prefHelper.bacaSemuaDeposit());
         adapter.notifyDataSetChanged();
@@ -88,9 +87,7 @@ public class DepositActivity extends AppCompatActivity {
     }
 
     private void kirimKeWa(int position) {
-        DepositModel dm = listDeposit.get(position);
-        String waktu = new SimpleDateFormat("dd/MM/yyyy  HH:mm", new Locale("in", "ID"))
-                .format(new Date());
+        DepositModel dm      = listDeposit.get(position);
         List<DepositModel.RiwayatBelanja> riwayat = dm.getRiwayat();
 
         if (riwayat.isEmpty()) {
@@ -99,24 +96,64 @@ public class DepositActivity extends AppCompatActivity {
             return;
         }
 
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("in", "ID"));
         StringBuilder sb = new StringBuilder();
-        sb.append("*List Belanja & Harga (").append(dm.getNama()).append(")*\n");
-        sb.append(waktu).append("\n");
-        sb.append("─────────────────\n");
 
         long totalPakai = 0;
-        for (DepositModel.RiwayatBelanja r : riwayat) {
-            sb.append("- ").append(r.getKeterangan())
-                    .append(" (").append(r.getQty()).append(" x ").append(formatRupiah(r.getHargaSatuan())).append(")")
-                    .append("  →  ").append(formatRupiah(r.getJumlah())).append("\n");
-            totalPakai += r.getJumlah();
-        }
+        for (DepositModel.RiwayatBelanja r : riwayat) totalPakai += r.getTotal();
 
-        sb.append("─────────────────\n");
-        sb.append("Saldo Awal : ").append(formatRupiah(dm.getDepositAwal())).append("\n");
-        sb.append("Total Pakai : ").append(formatRupiah(totalPakai)).append("\n");
-        sb.append("*─────────────────*\n");
-        sb.append("*Sisa Saldo: ").append(formatRupiah(dm.getSisaSaldo())).append("*");
+        boolean depositNol = dm.getDepositAwal() == 0;
+
+        if (depositNol) {
+            // ── Format seperti MyNote (tanpa info saldo) ──
+            String waktu = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm",
+                    new Locale("in", "ID")).format(new java.util.Date());
+
+            sb.append("*List Belanja & Harga*\n");
+            sb.append(waktu).append("\n");
+            sb.append("─────────────────\n");
+
+            for (DepositModel.RiwayatBelanja r : riwayat) {
+                if (r.getQty() > 1) {
+                    sb.append("- ").append(r.getKeterangan())
+                            .append(" (").append(r.getQty()).append(" x ")
+                            .append(formatRupiah(r.getHargaSatuan())).append(")")
+                            .append(" → ").append(formatRupiah(r.getTotal())).append("\n");
+                } else {
+                    sb.append("- ").append(r.getKeterangan())
+                            .append(" → ").append(formatRupiah(r.getHargaSatuan())).append("\n");
+                }
+            }
+
+            sb.append("─────────────────\n");
+            sb.append("*Total : ").append(formatRupiah(totalPakai)).append("*");
+
+        } else {
+            String waktu = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm",
+                    new Locale("in", "ID")).format(new java.util.Date());
+            // ── Format deposit normal (dengan info saldo) ──
+            sb.append("*List Belanja & Harga*\n");
+            sb.append(waktu).append("\n");
+
+            sb.append("─────────────────\n");
+            for (DepositModel.RiwayatBelanja r : riwayat) {
+                if (r.getQty() > 1) {
+                    sb.append("- ").append(r.getKeterangan())
+                            .append(" (").append(r.getQty()).append(" x ")
+                            .append(formatRupiah(r.getHargaSatuan())).append(")")
+                            .append("  →  ").append(formatRupiah(r.getTotal())).append("\n");
+                } else {
+                    sb.append("- ").append(r.getKeterangan())
+                            .append("  →  ").append(formatRupiah(r.getHargaSatuan())).append("\n");
+                }
+            }
+
+            sb.append("─────────────────\n");
+            sb.append("*Saldo Awal : ").append(formatRupiah(dm.getDepositAwal())).append("*\n");
+            sb.append("*Total Pakai : ").append(formatRupiah(totalPakai)).append("*\n");
+            sb.append("─────────────────\n");
+            sb.append("*Sisa Saldo : ").append(formatRupiah(dm.getSisaSaldo())).append("*");
+        }
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
@@ -154,12 +191,8 @@ public class DepositActivity extends AppCompatActivity {
         dialog.show();
 
         Window window = dialog.getWindow();
-        if (window != null) {
-            window.setLayout(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-        }
+        if (window != null) window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
     }
 
     private void showDialogHapus(int position) {

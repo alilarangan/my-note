@@ -52,7 +52,8 @@ public class SharedPrefHelper {
         try {
             String json = prefs.getString(KEY_DATA, "[]");
             JSONArray jsonArray = new JSONArray(json);
-            for (int i = 0; i < jsonArray.length(); i++) {
+//            for (int i = 0; i < jsonArray.length(); i++) {
+              for (int i = jsonArray.length() - 1; i >=0; i--){
                 JSONObject obj = jsonArray.getJSONObject(i);
                 DepositModel dm = new DepositModel(
                         obj.getString("id"),
